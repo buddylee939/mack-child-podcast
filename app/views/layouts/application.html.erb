@@ -10,6 +10,15 @@
   </head>
 
   <body>
+    <% if alert %>
+      <div id="notice_wrapper">
+        <p class="alert"><%= alert %></p>
+      </div>
+    <% elsif notice %>
+      <div id="notice_wrapper">
+        <p class="notice"><%= notice %></p>
+      </div>
+    <% end %>
     <%= yield %>
   </body>
 </html>

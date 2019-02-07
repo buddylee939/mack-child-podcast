@@ -257,4 +257,56 @@ textarea {
 ```
 
 - import background images from github
+
+## Creating podcast users with devise
+
+- install devise gem
+- rails g devise:install
+- add the flash messages to layout/app
+
+```
+<% if alert %>
+	<div id="notice_wrapper">
+		<p class="alert"><%= alert %></p>
+	</div>
+<% elsif notice %>
+	<div id="notice_wrapper">
+		<p class="notice"><%= notice %></p>
+	</div>
+<% end %>
+```
+
+- rails g devise:views
+- rails g devise Podcast
+- rails db:migrate
+- update the links on the welcome/index page
+
+```
+<div id="background">
+	<header class="cf">
+		<div class="wrapper_wide">
+			<a href="#" id="logo">Podcast.fm</a>
+			<nav>
+				<ul>
+					<% unless podcast_signed_in? %>
+						<li><%= link_to "Explore", "#" %></li>
+						<li><%= link_to "Sign In", new_podcast_session_path %></li>
+						<li><%= link_to "Create a Podcast", new_podcast_registration_path %></li>
+					<% else %>
+						<li><%= link_to "Dashboard", root_path %></li>
+						<li><%= link_to "Explore", "#" %></li>
+						<li><%= link_to "Sign Out", destroy_podcast_session_path, method: :delete %></li>
+					<% end %>
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<div class="wrapper_skinny">
+		<h1>Discover your new favorite<br> podcast, or create your own.</h1>
+		<%= link_to "Create a Podcast", new_podcast_registration_path, class: "button button_highlight" %>
+		<%= link_to "Explore", "#", class: "button button_white" %>
+	</div>
+</div>
+```
+
 - 
