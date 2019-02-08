@@ -378,4 +378,33 @@ end
 - add the code to the podcasts/show
 - update podcasts_path links
 
-  
+## Add episode model and associations
+
+- rails g model Episode title description:text podcast:references  
+- rails db:migrate
+- add the has many to podcast.rb
+
+```
+has_many :episodes
+```
+
+- rails g controller Episodes
+- update routes
+
+```
+  resources :podcasts, only: [:index, :show] do
+    resources :episodes
+  end
+```
+
+- update episodes controller
+- create the episodes: new/edit/show/form partial
+- in episodes controller, add the show to filter the current episode so it doesnt appear in the list with the current episode
+
+```
+ def show
+    @episodes = Episode.where(podcast_id: @podcast).order("created_at DESC").limit(6).reject { |e| e.id == @episode.id }
+  end
+```
+
+-   

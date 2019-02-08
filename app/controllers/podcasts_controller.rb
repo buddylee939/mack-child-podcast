@@ -16,7 +16,7 @@ class PodcastsController < ApplicationController
   private
 
   def find_episode
-    # @episodes = Episode.where(podcast_id: @podcast).order("created_at DESC")
+     @episodes = Episode.where(podcast_id: @podcast).order("created_at DESC")
   end
 
   def find_podcast
