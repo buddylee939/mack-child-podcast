@@ -309,4 +309,26 @@ textarea {
 </div>
 ```
 
+## Customizing devise 
+
+- rails g migration add_attributes_to_podcast title description:text itunes stitcher podbay
+- rails db:migrate
+- update the registration new form
+- update the registration edit
+- in application_controller, add the new fields for devise
+
+```
+class ApplicationController < ActionController::Base
+  before_action :configure_permitted_parameters, if: :devise_controller?
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:title])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:title, :description, :itunes, :stitcher, :podbay]
+    )
+  end
+end
+```
+
 - 

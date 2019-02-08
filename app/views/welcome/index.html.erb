@@ -11,6 +11,7 @@
 					<% else %>
 						<li><%= link_to "Dashboard", root_path %></li>
 						<li><%= link_to "Explore", "#" %></li>
+						<li><%= link_to "Edit Podcast", edit_podcast_registration_path %></li>
 						<li><%= link_to "Sign Out", destroy_podcast_session_path, method: :delete %></li>
 					<% end %>
 				</ul>
