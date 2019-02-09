@@ -9,9 +9,12 @@
 				<%= link_to podcast do %>
 					<li>
 						<%#= image_tag podcast.thumbnail.url(:medium) %>
+						<%= image_tag podcast.podcast_image %>
 						<div class="podcast_overview">
 							<h2><%= podcast.title %></h2>
-							<p class="episode_count">1 Episode</p>
+							<p class="episode_count">
+								<%= pluralize(podcast.episodes.count, 'episode') %>
+							</p>
 						</div>
 					</li>
 				<% end %>

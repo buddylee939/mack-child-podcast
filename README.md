@@ -407,4 +407,183 @@ has_many :episodes
   end
 ```
 
--   
+## Add dashboard and edit, destroy episodes
+
+- add the dashboard method to the podcasts controller
+
+```
+  def dashboard
+  end
+```
+
+- add the devise authenticated route for once when logged in
+
+```
+Rails.application.routes.draw do
+  devise_for :podcasts
+
+  resources :podcasts, only: [:index, :show] do
+    resources :episodes
+  end
+
+  authenticated :podcast do
+    root 'podcasts#dashboard', as: "authenticated_root"
+  end
+
+  root 'welcome#index'
+end
+
+```
+
+- in podcasts controller, add an if conditional to the podcasts controller, 
+
+```
+  def find_podcast
+    if params[:id].nil?
+      @podcast = current_podcast
+    else
+      @podcast = Podcast.find(params[:id])
+    end
+  end
+```
+
+- create a podcasts/dashboard file
+
+```
+<%= render 'layouts/header'; %>
+
+<div id="podcast_show">
+  <div id="show_banner">
+    <div class="wrapper_skinny">
+      <h1><%= @podcast.title %></h1>
+    </div>
+  </div>
+
+  <div id="links">
+    <div class="wrapper_skinny">
+      <ul>
+        <li class="current">Episodes</li>
+        <li><%= link_to "New Episode", new_podcast_episode_path(@podcast) %></li>
+        <li><%= link_to "Account Settings", edit_podcast_registration_path %></li>
+        <li><%= link_to "View Podcast", podcast_path(current_podcast) %></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="episodes">
+    <div class="wrapper_skinny">
+      <ul class="cf">
+        <% @episodes.each do |episode| %>
+          <li class="cf">
+            <div class="episode_thumbnail">
+              <a href="episode.html">
+                <%#= image_tag episode.episode_thumbnail.url(:medium) %>
+              </a>
+            </div>
+            <div class="episode_overview">
+              <h2><%= link_to episode.title, podcast_episode_path(@podcast, episode) %></h2>
+              <p class="description"><%= truncate(episode.description, lenght: 160) %></p>
+              <div class="authorized_links">
+                <%= link_to "Edit", edit_podcast_episode_path(@podcast, episode) %>
+                <%= link_to "Delete", podcast_episode_path(@podcast, episode), method: :delete, data: {confirm: "Are you sure?"} %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<%#= will_paginate @episodes, previous_label: "Previous", next_label: "Next" %>
+```
+
+## Add authentication to podcasts
+
+- update episodes controller to add authentication except show
+
+```
+ class EpisodesController < ApplicationController
+  before_action :authenticate_podcast!, except: [:show]
+  before_action :require_permission
+  before_action :find_podcast
+  before_action :find_episode, only: [:show, :edit, :update, :destroy]
+
+```
+
+- to not allow one podcast creator to add new episodes to another podcasts, in episodes controller add the require permission method
+
+```
+ class EpisodesController < ApplicationController
+  before_action :authenticate_podcast!, except: [:show]
+  before_action :require_permission
+  before_action :find_podcast
+  before_action :find_episode, only: [:show, :edit, :update, :destroy]
+  private
+  def require_permission
+    @podcast = Podcast.find(params[:podcast_id])
+    if current_podcast != @podcast
+      redirect_to root_path, notice: "Sorry, you're not allowed to view that page"
+    end
+  end
+
+```
+
+## Paperclip - I'm gonna use active storage
+
+```
+2 Setup
+Active Storage uses two tables in your application’s database named active_storage_blobs and active_storage_attachments. After creating a new application (or upgrading your application to Rails 5.2), run rails active_storage:install to generate a migration that creates these tables. Use rails db:migrate to run the migration.
+```
+
+- edit episode and podcast models
+
+```
+class Episode < ApplicationRecord
+  has_one_attached :episode_image
+  belongs_to :podcast
+end
+class Podcast < ApplicationRecord
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable
+  has_many :episodes
+  has_one_attached :podcast_image
+end
+```
+
+- update episodes controller params
+
+```
+  def episode_params
+    params.require(:episode).permit(:title, :description, :episode_image)
+  end
+```
+
+- update the episodes form
+
+```
+	<div class="field">
+		<%= f.label :episode_image %><br>
+		<%= f.file_field :episode_image %>
+	</div>
+```
+
+- update the image show
+
+```
+<%= image_tag @episode.episode_image, class: "current_episode_thumbnail" %>
+``` 
+
+- add the podcast image to the params in application controller
+
+```
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:title, :podcast_image])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:title, :description, :itunes, :stitcher, :podbay, :podcast_image]
+    )
+  end
+```
+
+-   	
