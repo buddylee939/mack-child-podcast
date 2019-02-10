@@ -954,4 +954,18 @@ puts '100 episodes created'
 }
 ```
 
+- add a script to the layouts/app to fade out the flash messages
+
+```
+<script>
+	$(document).ready(function(){
+		setTimeout(function() {
+			$('#notice_wrapper').fadeOut("slow", function() {
+				$this.remove();
+			});
+		}, 4500 );
+	});
+</script>
+```
+
 - 
