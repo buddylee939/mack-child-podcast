@@ -63,3 +63,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'devise', '~> 4.5'
 gem 'jquery-rails', '~> 4.3', '>= 4.3.3'
 gem 'font-awesome-rails', '~> 4.7', '>= 4.7.0.4'
+gem 'will_paginate', '~> 3.1', '>= 3.1.6'

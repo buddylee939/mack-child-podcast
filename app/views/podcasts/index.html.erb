@@ -9,7 +9,9 @@
 				<%= link_to podcast do %>
 					<li>
 						<%#= image_tag podcast.thumbnail.url(:medium) %>
-						<%= image_tag podcast.podcast_image %>
+						<% if podcast.podcast_image.attached? %>
+							<%= image_tag podcast.podcast_image %>
+						<% end %>
 						<div class="podcast_overview">
 							<h2><%= podcast.title %></h2>
 							<p class="episode_count">
@@ -21,6 +23,6 @@
 			<% end %>
 		</ul>
 
-		<%#= will_paginate @podcasts, previous_label: "Previous", next_label: "Next" %>
+		<%= will_paginate @podcasts, previous_label: "Previous", next_label: "Next" %>
 	</div>
 </div>

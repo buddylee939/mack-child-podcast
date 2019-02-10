@@ -416,7 +416,7 @@ has_many :episodes
   end
 ```
 
-- add the devise authenticated route for once when logged in
+- add the devise authenticated route for once when logged in, this is for once we are logged in, the root_path becomes the dashboard and not the welcome/index
 
 ```
 Rails.application.routes.draw do
@@ -829,3 +829,129 @@ has_one_attached :mp3_file
 	});
 </script>
 ```
+
+- [using jPlayer](http://jplayer.org/)
+
+## Add pagination and other goodies
+
+- add will paginate gem
+- update podcasts controller methods
+
+```
+  def index
+    @podcasts = Podcast.all.order("created_at DESC").paginate(:page => params[:page], :per_page => 12)
+  end
+
+  def show
+  end
+
+  def dashboard
+  end
+
+  private
+
+  def find_episode
+     @episodes = Episode.where(podcast_id: @podcast).order("created_at DESC").paginate(:page => params[:page], :per_page => 5)
+  end
+```
+
+- to seed the podcasts and episodes with files, in environments/dev add
+
+```
+config.active_job.queue_adapter = :inline
+```
+
+- in the seed file
+
+```
+20.times do |p|
+ pod = Podcast.create!(
+    title: "Podcast no:#{p}",
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis aliquam quidem, ipsum in quos. Dolorem alias, aliquid culpa magni quaerat incidunt non earum odit, cupiditate minima amet, numquam voluptatum reprehenderit!",
+    email: "abby#{p}@example.com",
+    itunes: "#",
+    stitcher: "#",
+    podbay: "#",
+    password: 'asdfasdf',
+    password_confirmation: 'asdfasdf', 
+  )
+ pod.podcast_image.attach(
+  io: File.open('app/assets/images/logo6.jpg'), 
+  filename: 'logo6.jpg', 
+  content_type: 'image/jpg'
+ )
+
+end
+
+puts '20 podcasts created'
+
+100.times do |e|
+  ep = Episode.create!(
+    title: " Episode #{e}",
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto voluptatem ipsum sapiente, maxime! Nostrum eos, odio asperiores quis incidunt molestias.",
+    podcast_id: rand(1..20)
+  )
+  ep.mp3_file.attach(
+    io: File.open('app/assets/images/1-01 Survival.mp3'), 
+    filename: '1-01 Survival.mp3', 
+    content_type: 'audio/mpeg'
+  )
+  ep.episode_image.attach(
+    io: File.open('app/assets/images/logo1.jpg'), 
+    filename: 'logo1.jpg', 
+    content_type: 'image/jpg'    
+  )
+end
+
+puts '100 episodes created'
+
+```  
+
+- **you might have to close postgres app and exit out of the page**
+- css for pagination
+
+```
+
+.pagination:before, .pagination:after {
+	content: " ";
+	display: table;
+}
+
+.pagination:after {
+	clear: both;
+}
+
+.pagination {
+	text-align: center;
+	margin: 1rem 0 5rem 0;
+	a, .previous_page, .current, .next_page {
+		padding: 0.75rem 1rem;
+		margin: 0 .25rem;
+		border-radius: .15rem;
+		line-height: 1.25;
+		text-decoration: none;
+		background: #EDEFF5;
+		font-weight: 700;
+		font-size: .7rem;
+		font-style: normal;
+		color: $dark;
+		&:hover {
+			background: $highlight;
+			color: $white;
+		}
+	}
+	.current {
+		background: $highlight;
+		color: $white;
+	}
+	.disabled {
+		color: #C0C0C0;
+		&:hover {
+			color: #C0C0C0;
+			background: #EDEFF5;
+		}
+	}
+}
+```
+
+- 
