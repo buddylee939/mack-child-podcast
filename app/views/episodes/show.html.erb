@@ -73,10 +73,9 @@
 				<% @episodes.each do |episode| %>
 					<li class="cf">
 						<div class="episode_thumbnail">
-							<a href="episode.html">
-								<%#= image_tag episode.episode_thumbnail.url(:medium) %>
-								<%= image_tag @episode.episode_image %>
-							</a>
+							<%= link_to podcast_episode_path(@podcast, episode) do %>
+								<%= image_tag episode.episode_image %>
+							<% end %>
 						</div>
 						<div class="episode_overview">
 							<h2><%= link_to episode.title, podcast_episode_path(@podcast, episode) %></h2>
@@ -88,3 +87,17 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	$(document).ready(function(){
+	  $("#jquery_jplayer_1").jPlayer({
+	    ready: function () {
+	      $(this).jPlayer("setMedia", {
+	        mp3: "<%= rails_blob_url(@episode.mp3_file) %>",
+	      });
+	    },
+	    swfPath: "/js",
+	    supplied: "mp3"
+	  });
+	});
+</script>

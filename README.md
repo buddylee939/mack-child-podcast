@@ -586,4 +586,246 @@ end
   end
 ```
 
--   	
+## Store assets on Amazon S3 - we need to do it a different way, with credentials etc
+
+- not needed, i don't think
+
+## Add mp3 uploads and mp3 player
+
+- to see the image file name in rails console
+
+```
+ e.episode_image.filename
+```
+
+- update episode.rb
+
+```
+has_one_attached :mp3_file
+```
+
+- update the episode form partial
+
+```
+	<div class="field">
+		<%= f.label :mp3_file %><br>
+		<%= f.file_field :mp3_file %>
+	</div>
+
+```  	
+
+- update the episode params in episode controller
+
+```
+  def episode_params
+    params.require(:episode).permit(:title, :description, :episode_image, :mp3_file)
+  end
+```
+
+- add the font-awesome rails gem and import scss on app.scss
+
+```
+@import "font-awesome";
+```
+
+- add jquery-rails gem
+- add the jquery.jplayer.min.js file from the jplayer website to the js folder
+- update the app.js
+
+```
+//= require jquery
+//= require rails-ujs
+//= require jquery.jplayer.min
+//= require activestorage
+//= require turbolinks
+//= require_tree .
+```
+
+- add the jp scss
+
+```
+	#episode_content {
+		padding: 4rem 0;
+		margin-bottom: 4rem;
+		border-bottom: 1px solid lighten($dark, 75%);
+		.current_episode_thumbnail {
+			display: block;
+			margin: 0 auto 2rem auto;
+			width: 10rem;
+			max-width: 100%;
+			border-radius: .35rem;
+		}
+		h2 {
+			font-size: 1.5rem;
+			text-align: center;
+		}
+		.description {
+			text-align: center;
+			font-size: .9rem;
+			line-height: 1.7;
+			color: lighten($dark, 25%);
+		}
+		a {
+			text-decoration: none;
+		}
+		.jp-jplayer,.jp-audio {
+    width: 70%;
+    margin: 3rem auto .5rem auto;
+		}
+		.jp-title {
+	    font-size: 12px;
+	    text-align: center;
+	    color: #999;
+		}
+		.jp-title ul {
+	    padding: 0;
+	    margin: 0;
+	    list-style: none;
+		}
+		.jp-gui {
+	    position: relative;
+	    background: $highlight;
+	    transition: background .4s ease-in-out;
+	    border-radius: 3px;
+	    overflow: hidden;
+	    margin-top: 10px;
+		}
+		.jp-controls {
+	    padding: 0;
+	    margin: 0;
+	    list-style: none;
+	    font-family: "FontAwesome";
+		}
+
+		.jp-controls li {
+	    display: inline;
+		}
+
+		.jp-controls a {
+	    color: #fff;
+		}
+		.jp-play,.jp-pause {
+	    width: 60px;
+	    height: 40px;
+	    display: inline-block;
+	    text-align: center;
+	    line-height: 43px;
+	    border-right: 1px solid lighten($highlight, 10%);
+		}
+
+		.jp-controls .jp-play:hover,.jp-controls .jp-pause:hover {
+	    background-color: darken($highlight, 10%);
+		}
+
+		.jp-mute,.jp-unmute {
+	    position: absolute;
+	    right: 59px;
+	    top: -3px;
+	    width: 20px;
+	    height: 40px;
+	    display: inline-block;
+	    line-height: 46px;
+		}
+
+		.jp-mute {
+	    text-align: left;
+		}
+		.jp-time-holder {
+	    color: #FFF;
+	    font-size: 12px;
+	    line-height: 14px;
+	    position: absolute;
+	    right: 90px;
+	    top: 14px;
+		}
+		.jp-progress {
+	    background-color: darken($highlight, 25%);
+	    border-radius: 20px 20px 20px 20px;
+	    overflow: hidden;
+	    position: absolute;
+	    right: 22%;
+	    top: 15px;
+	    width: 65%;
+		}
+
+		.jp-play-bar {
+	    height: 12px;
+	    background-color: #fff;
+	    border-radius: 20px 20px 20px 20px;
+		}
+
+		.jp-volume-bar {
+	    position: absolute;
+	    right: 10px;
+	    top: 17px;
+	    width: 45px;
+	    height: 8px;
+	    border-radius: 20px 20px 20px 20px;
+	    background-color: darken($highlight, 25%);
+	    overflow: hidden;
+		}
+
+		.jp-volume-bar-value {
+	    background-color: #fff;
+	    height: 8px;
+	    border-radius: 20px 20px 20px 20px;
+		}
+	}
+```
+
+- add the jpayer html to the show page
+
+```
+			<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+      <div id="jp_container_1" class="jp-audio">
+        <div class="jp-type-single">
+          <div class="jp-gui jp-interface">
+            <ul class="jp-controls">
+              <li><a href="javascript:;" class="jp-play" tabindex="1">&#61515;</a></li>
+              <li><a href="javascript:;" class="jp-pause" tabindex="1">&#61516;</a></li>
+              <li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">&#61480;</a></li>
+              <li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">&#61478;</a></li>
+            </ul>
+
+            <div class="jp-progress">
+              <div class="jp-seek-bar">
+                <div class="jp-play-bar"></div>
+              </div>
+            </div>
+
+            <div class="jp-time-holder">
+              <div class="jp-current-time"></div>
+            </div>
+
+            <div class="jp-volume-bar">
+              <div class="jp-volume-bar-value"></div>
+            </div>
+
+            <div class="jp-no-solution">
+              <span>Update Required</span>
+              To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+		</div>
+	</div>
+```
+
+- and add a script at the bottom with the url blob link
+
+```
+<script>
+	$(document).ready(function(){
+	  $("#jquery_jplayer_1").jPlayer({
+	    ready: function () {
+	      $(this).jPlayer("setMedia", {
+	        mp3: "<%= rails_blob_url(@episode.mp3_file) %>",
+	      });
+	    },
+	    swfPath: "/js",
+	    supplied: "mp3"
+	  });
+	});
+</script>
+```
